@@ -10,17 +10,23 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
-public class BorrowReturnService {
+public class BorrowService {
 
     @Autowired
     BorrowRepo borRepo;
-    @Autowired
-    ReturnRepo retRepo;
+
     @Autowired
     InventoryRepo itemRepo;
+
+    public List<Borrow> getBorrows(){
+
+        return borRepo.findAll();
+    }
+
 
     @Transactional
     public boolean itemBorrow(Borrow br){
@@ -42,24 +48,15 @@ public class BorrowReturnService {
     }
 
     @Transactional
-    public boolean itemReturn(Return rt){
+    public boolean itemBorrowEdit(int id, Borrow br){
 
-        Optional<Inventory> optional = itemRepo.findById(rt.getItemId());;
+        Optional<Borrow> optional = borRepo.findById(id);;
         if (optional.isEmpty()) return false;
-        Optional<Borrow> borrow = borRepo.findById(rt.getBorrowId());;
-        if (borrow.isEmpty() || rt.getQuantity()!=borrow.get().getQuantity()) return false;//return only works when return quantity is in full for now
 
-        Inventory item = optional.get();
-        Borrow bor = borrow.get();
-
-        item.setQuantity(item.getQuantity()+rt.getQuantity());
-        bor.setReturned(true);
-        itemRepo.save(item);
-        retRepo.save(rt);
-        borRepo.save(bor);
+        borRepo.save(br);
         return true;
-    }
 
+    }
 
 
 }
