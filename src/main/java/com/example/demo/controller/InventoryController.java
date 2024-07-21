@@ -1,14 +1,18 @@
 package com.example.demo.controller;
 
 
+import com.example.demo.entity.Borrow;
 import com.example.demo.entity.Inventory;
 import com.example.demo.model.ItemQuantity;
 import com.example.demo.model.ResponseMessage;
 import com.example.demo.service.InventoryService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 //@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("api/inventory")
@@ -18,15 +22,16 @@ public class InventoryController {
     @Autowired
     private InventoryService itemService;
 
-
+    @Operation(summary = "View all items in inventory")
     @GetMapping("/getitems")
     @ResponseBody
-    ResponseEntity<Object> getInventory(){
+    List<Inventory> getInventory(){
 
-        return ResponseEntity.status(HttpStatus.OK).body(itemService.getInventory());
+        return itemService.getInventory();
 
     }
 
+    @Operation(summary = "Add an item (tool/material) data to inventory")
     @PostMapping("/additem")
     @ResponseBody
     ResponseEntity<ResponseMessage> addInventory(@RequestBody Inventory pr){
@@ -43,6 +48,8 @@ public class InventoryController {
             return ResponseEntity.status(stt).body(rm);
 
     }
+
+    @Operation(summary = "Delete an item in inventory")
     @DeleteMapping("/deleteitem/{id}")
     @ResponseBody
     ResponseEntity<ResponseMessage> deleteInventory(@PathVariable("id") String id){
@@ -59,7 +66,7 @@ public class InventoryController {
         return ResponseEntity.status(stt).body(rm);
 
     }
-
+    @Operation(summary = "Modify an item in inventory")
     @PutMapping("/updateitem/{id}")
     @ResponseBody
     ResponseMessage updateInventory(@PathVariable("id") String id, @RequestBody Inventory inv){
@@ -73,7 +80,7 @@ public class InventoryController {
 
     }
 
-
+    @Operation(summary = "Modify stored item quantity only")
     @PostMapping("/additemquantity")
     @ResponseBody
     ResponseEntity<ResponseMessage> addQuantity(@RequestBody ItemQuantity itq){

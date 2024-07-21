@@ -6,6 +6,7 @@ import com.example.demo.entity.User;
 import com.example.demo.model.ResponseMessage;
 import com.example.demo.service.InventoryService;
 import com.example.demo.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,7 +20,7 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-
+    @Operation(summary = "Add new user info")
     @PostMapping("/registeruser")
     @ResponseBody
     ResponseEntity<ResponseMessage> addUser(@RequestBody User user){
@@ -37,10 +38,7 @@ public class UserController {
 
     }
 
-
-
-
-
+    @Operation(summary = "Delete user from table")
     @DeleteMapping("/deleteuser/{id}")
     @ResponseBody
     ResponseEntity<ResponseMessage> deleteUser(@PathVariable("id") int id){
@@ -58,4 +56,21 @@ public class UserController {
 
     }
 
+    @Operation(summary = "Edit user data in table")
+    @PutMapping("/edituser/{id}")
+    @ResponseBody
+    ResponseEntity<ResponseMessage> editUser(@PathVariable("id") int id, @RequestBody User usr){
+        HttpStatus stt;
+        ResponseMessage rm;
+        if(userService.editUser(id,usr)) {
+            stt = HttpStatus.OK;
+            rm = new ResponseMessage(stt, "Success");
+        }else {
+            stt=HttpStatus.BAD_REQUEST;
+            rm = new ResponseMessage(stt,"Bad request");
+        }
+
+        return ResponseEntity.status(stt).body(rm);
+
+    }
 }

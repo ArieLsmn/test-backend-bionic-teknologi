@@ -32,19 +32,39 @@ public class ReturnService {
     @Transactional
     public boolean itemReturn(Return rt){
 
-        Optional<Inventory> optional = itemRepo.findById(rt.getItemId());;
-        if (optional.isEmpty()) return false;
-        Optional<Borrow> borrow = borRepo.findById(rt.getBorrowId());;
-        if (borrow.isEmpty() || rt.getQuantity()!=borrow.get().getQuantity()) return false;//return only works when return quantity is in full for now
+        Optional<Inventory> optional = itemRepo.findById(rt.getItemId());
 
-        Inventory item = optional.get();
+        if (optional.isEmpty()) return false;
+
+        Optional<Borrow> borrow = borRepo.findById(rt.getBorrowId());
+
+        if(borrow.isEmpty()) return false;
+
+        int prevReturnTotal = retRepo.getReturnQuantitySumByBorrowId(rt.getBorrowId());
+
+        System.out.println(prevReturnTotal);
+
         Borrow bor = borrow.get();
 
+        int remainingBorrow = bor.getQuantity()-prevReturnTotal;
+
+        System.out.println(remainingBorrow);
+
+        if (rt.getQuantity()>remainingBorrow) return false;
+        else if (rt.getQuantity()==remainingBorrow) {
+            bor.setReturned(true);
+            borRepo.save(bor);
+        }
+
+
+        Inventory item = optional.get();
+
+
         item.setQuantity(item.getQuantity()+rt.getQuantity());
-        bor.setReturned(true);
+
         itemRepo.save(item);
         retRepo.save(rt);
-        borRepo.save(bor);
+
         return true;
     }
 
