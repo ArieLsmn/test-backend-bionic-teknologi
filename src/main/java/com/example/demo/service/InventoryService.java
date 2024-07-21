@@ -12,10 +12,10 @@ import java.util.Optional;
 @Service
 public class InventoryService {
     @Autowired
-    InventoryRepo prodRepo;
+    InventoryRepo itemRepo;
 
     public List<Inventory> getInventory(){
-        List<Inventory> listProd =prodRepo.findAll();
+        List<Inventory> listProd =itemRepo.findAll();
 
         return listProd;
     }
@@ -24,7 +24,26 @@ public class InventoryService {
     public boolean addInventory(Inventory p) {
 
         try {
-            prodRepo.save(p);
+            itemRepo.save(p);
+        }catch (Exception e){
+            return false;
+        }
+
+        return true;
+    }
+
+    public boolean addItemQuantity(int id, int count) {
+
+        Optional<Inventory> optional = itemRepo.findById(id);
+        if (optional.isEmpty()) {
+            return false;
+        }
+
+        Inventory newItem = optional.get();
+        newItem.setQuantity(newItem.getQuantity()+count);
+
+        try {
+            itemRepo.save(newItem);
         }catch (Exception e){
             return false;
         }
@@ -33,16 +52,15 @@ public class InventoryService {
     }
 
 
-
     public boolean deleteInventory(int id){
-        Optional<Inventory> optional = prodRepo.findById(id);
+        Optional<Inventory> optional = itemRepo.findById(id);
 
         if (optional.isEmpty()) {
             return false;
         }
         else {
             try {
-                prodRepo.deleteById(id);
+                itemRepo.deleteById(id);
             }catch(Exception e){
                 throw(e);
             }
@@ -51,14 +69,14 @@ public class InventoryService {
 
     }
     public boolean updateInventory(int id, Inventory inv){
-        Optional<Inventory> optional = prodRepo.findById(id);
+        Optional<Inventory> optional = itemRepo.findById(id);
 
         if (optional.isEmpty()) {
             return false;
         }
         else {
             try {
-                prodRepo.save(inv);
+                itemRepo.save(inv);
             }catch (Exception e){
                 return false;
             }

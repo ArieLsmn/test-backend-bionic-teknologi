@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 
 import com.example.demo.entity.Inventory;
+import com.example.demo.model.ItemQuantity;
 import com.example.demo.model.ResponseMessage;
 import com.example.demo.service.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +70,24 @@ public class InventoryController {
             return new ResponseMessage(HttpStatus.OK, "Success");
 
         else return new ResponseMessage(HttpStatus.NOT_FOUND, "Data not found");
+
+    }
+
+
+    @PostMapping("/additemquantity")
+    @ResponseBody
+    ResponseEntity<ResponseMessage> addQuantity(@RequestBody ItemQuantity itq){
+        HttpStatus stt;
+        ResponseMessage rm;
+        if(itemService.addItemQuantity(itq.getId(),itq.getQuantity())) {
+            stt = HttpStatus.OK;
+            rm = new ResponseMessage(stt, "Success");
+        }else {
+            stt=HttpStatus.BAD_REQUEST;
+            rm = new ResponseMessage(stt,"Bad request");
+        }
+
+        return ResponseEntity.status(stt).body(rm);
 
     }
 
